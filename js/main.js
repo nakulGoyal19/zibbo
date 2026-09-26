@@ -4,6 +4,37 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- Auto-scroll to Products after hero ---
+    let userHasScrolled = false;
+    const onUserScroll = () => { userHasScrolled = true; };
+    window.addEventListener('scroll', onUserScroll, { once: true });
+    window.addEventListener('touchstart', onUserScroll, { once: true });
+    window.addEventListener('wheel', onUserScroll, { once: true });
+
+    setTimeout(() => {
+        if (!userHasScrolled) {
+            const productsSection = document.getElementById('products');
+            if (productsSection) {
+                const navHeight = document.querySelector('.navbar').offsetHeight;
+                window.scrollTo({
+                    top: productsSection.getBoundingClientRect().top + window.pageYOffset - navHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, 2500);
+
+    // --- Hero Image Carousel ---
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    if (heroSlides.length > 1) {
+        let currentSlide = 0;
+        setInterval(() => {
+            heroSlides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % heroSlides.length;
+            heroSlides[currentSlide].classList.add('active');
+        }, 3000);
+    }
+
     // --- Mobile Menu Toggle ---
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const mobileMenu = document.querySelector('.mobile-menu');
@@ -55,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Scroll animations ---
     const observerOptions = {
-        threshold: 0.15,
+        threshold: 0.1,
         rootMargin: '0px 0px -40px 0px'
     };
 
@@ -68,9 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    // Add fade-in class to sections
+    // Add fade-in class to animated elements
     const animatedElements = document.querySelectorAll(
-        '.about-card, .product-showcase, .pillar-card, .contact-card, .notify-content'
+        '.about-card, .product-card, .pillar-card, .contact-card, .whatsapp-cta-banner'
     );
     animatedElements.forEach(el => {
         el.classList.add('fade-in');
@@ -78,88 +109,89 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Stagger animation for grid items
-    document.querySelectorAll('.about-grid, .pillars-grid, .contact-grid').forEach(grid => {
+    document.querySelectorAll('.about-grid, .products-grid, .pillars-grid, .contact-grid').forEach(grid => {
         const cards = grid.children;
         Array.from(cards).forEach((card, index) => {
             card.style.transitionDelay = `${index * 0.1}s`;
         });
     });
 
-    // --- Notify tabs (Email / Mobile toggle) ---
-    const notifyTabs = document.querySelectorAll('.notify-tab');
-    const emailInput = document.getElementById('notify-email');
-    const mobileInput = document.getElementById('notify-mobile');
-    let activeTab = 'email';
+    // --- Product card gallery (dot switching + lightbox) ---
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    const lbDots = document.getElementById('lightbox-dots');
+    const lbClose = document.getElementById('lightbox-close');
+    const lbPrev = document.getElementById('lightbox-prev');
+    const lbNext = document.getElementById('lightbox-next');
+    let lbImages = [];
+    let lbIndex = 0;
 
-    notifyTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            notifyTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            activeTab = tab.dataset.tab;
+    function openLightbox(images, startIndex) {
+        lbImages = images;
+        lbIndex = startIndex;
+        renderLightbox();
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
 
-            if (activeTab === 'email') {
-                emailInput.style.display = '';
-                emailInput.required = true;
-                mobileInput.style.display = 'none';
-                mobileInput.required = false;
-                mobileInput.value = '';
-            } else {
-                emailInput.style.display = 'none';
-                emailInput.required = false;
-                emailInput.value = '';
-                mobileInput.style.display = '';
-                mobileInput.required = true;
-            }
-        });
-    });
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+    }
 
-    // --- Notify form submit (sends to Google Sheets via Apps Script) ---
-    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwV23tvoc1Il6mKQsts5e9XgQg-g7vpGfn77Nk-nzrR-ojjbnCYkTH7yHnE2duwJ0z6Tw/exec';
-
-    const notifyForm = document.getElementById('notify-form');
-    if (notifyForm) {
-        notifyForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const submitBtn = notifyForm.querySelector('button[type="submit"]');
-            const value = activeTab === 'email' ? emailInput.value.trim() : mobileInput.value.trim();
-            const type = activeTab;
-
-            if (!value) return;
-
-            // Disable form while submitting
-            emailInput.disabled = true;
-            mobileInput.disabled = true;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
-
-            fetch(GOOGLE_SHEET_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: type === 'email' ? value : '', mobile: type === 'mobile' ? value : '', type: type })
-            })
-            .then(() => {
-                const label = type === 'email' ? value : value;
-                const notifySection = document.querySelector('.notify-content');
-                const tabsEl = document.querySelector('.notify-tabs');
-                if (tabsEl) tabsEl.style.display = 'none';
-                notifyForm.innerHTML = `
-                    <div class="notify-success show">
-                        <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 4px;">You're on the list!</p>
-                        <p style="font-size: 0.9rem; opacity: 0.8;">We'll notify you at <strong>${label}</strong> when Zibbo launches.</p>
-                    </div>
-                `;
-            })
-            .catch(() => {
-                emailInput.disabled = false;
-                mobileInput.disabled = false;
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Notify Me';
-                alert('Something went wrong. Please try again.');
-            });
+    function renderLightbox() {
+        lbImg.src = lbImages[lbIndex];
+        lbDots.innerHTML = lbImages.map((_, i) =>
+            `<span class="ldot${i === lbIndex ? ' active' : ''}" data-i="${i}"></span>`
+        ).join('');
+        lbDots.querySelectorAll('.ldot').forEach(d => {
+            d.addEventListener('click', () => { lbIndex = +d.dataset.i; renderLightbox(); });
         });
     }
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    lbPrev.addEventListener('click', () => { lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length; renderLightbox(); });
+    lbNext.addEventListener('click', () => { lbIndex = (lbIndex + 1) % lbImages.length; renderLightbox(); });
+    document.addEventListener('keydown', e => {
+        if (!lightbox.classList.contains('open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') { lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length; renderLightbox(); }
+        if (e.key === 'ArrowRight') { lbIndex = (lbIndex + 1) % lbImages.length; renderLightbox(); }
+    });
+
+    // Touch swipe for lightbox
+    let lbTouchStartX = 0;
+    lightbox.addEventListener('touchstart', e => { lbTouchStartX = e.touches[0].clientX; }, { passive: true });
+    lightbox.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - lbTouchStartX;
+        if (Math.abs(dx) > 40) {
+            lbIndex = dx < 0
+                ? (lbIndex + 1) % lbImages.length
+                : (lbIndex - 1 + lbImages.length) % lbImages.length;
+            renderLightbox();
+        }
+    });
+
+    // Wire up each product card image area
+    document.querySelectorAll('.product-card-img[data-gallery]').forEach(imgArea => {
+        const images = JSON.parse(imgArea.dataset.gallery);
+        const dots = imgArea.querySelectorAll('.gdot');
+
+        // Dot clicks open lightbox at that index
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', e => {
+                e.stopPropagation();
+                openLightbox(images, i);
+            });
+        });
+
+        // Click anywhere on image area → open lightbox at index 0
+        imgArea.addEventListener('click', (e) => {
+            if (e.target.classList.contains('gdot')) return;
+            openLightbox(images, 0);
+        });
+    });
 
     // --- Active nav link highlight on scroll ---
     const sections = document.querySelectorAll('section[id]');
