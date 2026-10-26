@@ -213,4 +213,358 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+
+    // =============================================
+    // CART & CHECKOUT
+    // =============================================
+
+    const SHIPPING_FREE_THRESHOLD = 500; // in rupees
+    const SHIPPING_CHARGE = 50;
+    const MAX_QTY = 100;
+
+    // Cart state: { productId: qty }
+    const cart = {};
+
+    // DOM refs
+    const cartBar = document.getElementById('cart-bar');
+    const cartBarCount = document.getElementById('cart-bar-count');
+    const cartBarTotal = document.getElementById('cart-bar-total');
+    const cartBarShipping = document.getElementById('cart-bar-shipping');
+    const cartBarCheckout = document.getElementById('cart-bar-checkout');
+
+    const checkoutModal = document.getElementById('checkout-modal');
+    const checkoutBackdrop = document.getElementById('checkout-backdrop');
+    const checkoutClose = document.getElementById('checkout-close');
+    const checkoutForm = document.getElementById('checkout-form');
+    const checkoutSummary = document.getElementById('checkout-summary');
+    const checkoutShippingInfo = document.getElementById('checkout-shipping-info');
+    const checkoutPayAmount = document.getElementById('checkout-pay-amount');
+    const checkoutPayBtn = document.getElementById('checkout-pay-btn');
+
+    const stepForm = document.getElementById('checkout-step-form');
+    const stepSuccess = document.getElementById('checkout-step-success');
+    const stepFailure = document.getElementById('checkout-step-failure');
+    const successMsg = document.getElementById('checkout-success-msg');
+    const failureMsg = document.getElementById('checkout-failure-msg');
+    const doneBtn = document.getElementById('checkout-done-btn');
+    const retryBtn = document.getElementById('checkout-retry-btn');
+
+    // Get product info from DOM
+    function getProductCards() {
+        return document.querySelectorAll('.product-card[data-product-id]');
+    }
+
+    // --- Qty Picker Logic ---
+    getProductCards().forEach(card => {
+        const id = card.dataset.productId;
+        const qtyValue = card.querySelector('.qty-value');
+        const qtyMinus = card.querySelector('.qty-minus');
+        const qtyPlus = card.querySelector('.qty-plus');
+        const qtyPicker = card.querySelector('.qty-picker');
+        const addBtn = card.querySelector('.add-to-cart-btn');
+
+        cart[id] = 0;
+
+        function syncUI() {
+            qtyValue.textContent = cart[id];
+            if (cart[id] > 0) {
+                addBtn.style.display = 'none';
+                qtyPicker.style.display = '';
+                qtyPicker.classList.add('has-items');
+            } else {
+                addBtn.style.display = '';
+                qtyPicker.style.display = 'none';
+                qtyPicker.classList.remove('has-items');
+            }
+            updateCartBar();
+        }
+
+        addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cart[id] = 1;
+            syncUI();
+        });
+
+        qtyPlus.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (cart[id] < MAX_QTY) {
+                cart[id]++;
+                syncUI();
+            }
+        });
+
+        qtyMinus.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (cart[id] > 0) {
+                cart[id]--;
+                syncUI();
+            }
+        });
+    });
+
+    function getCartItems() {
+        const items = [];
+        getProductCards().forEach(card => {
+            const id = card.dataset.productId;
+            const qty = cart[id] || 0;
+            if (qty > 0) {
+                items.push({
+                    id,
+                    name: card.dataset.productName,
+                    price: parseInt(card.dataset.productPrice, 10),
+                    qty,
+                });
+            }
+        });
+        return items;
+    }
+
+    function getCartSubtotal(items) {
+        return items.reduce((sum, item) => sum + item.price * item.qty, 0);
+    }
+
+    function getShipping(subtotal) {
+        return subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_CHARGE;
+    }
+
+    function updateCartBar() {
+        const items = getCartItems();
+        const totalItems = items.reduce((sum, i) => sum + i.qty, 0);
+        const subtotal = getCartSubtotal(items);
+        const shipping = getShipping(subtotal);
+        const total = subtotal + shipping;
+
+        if (totalItems > 0) {
+            cartBar.classList.add('visible');
+            cartBarCount.textContent = totalItems === 1 ? '1 item' : `${totalItems} items`;
+            cartBarTotal.textContent = `₹${subtotal}`;
+            if (shipping > 0) {
+                cartBarShipping.textContent = `(+₹${shipping} shipping)`;
+            } else {
+                cartBarShipping.textContent = 'Free shipping';
+            }
+        } else {
+            cartBar.classList.remove('visible');
+        }
+    }
+
+    // --- Checkout Modal ---
+    cartBarCheckout.addEventListener('click', openCheckout);
+
+    function openCheckout() {
+        const items = getCartItems();
+        if (items.length === 0) return;
+
+        // Reset to form step
+        stepForm.style.display = '';
+        stepForm.classList.remove('checkout-step-hidden');
+        stepSuccess.style.display = 'none';
+        stepSuccess.classList.add('checkout-step-hidden');
+        stepFailure.style.display = 'none';
+        stepFailure.classList.add('checkout-step-hidden');
+
+        // Render order summary
+        const subtotal = getCartSubtotal(items);
+        const shipping = getShipping(subtotal);
+        const total = subtotal + shipping;
+
+        let summaryHTML = items.map(item => `
+            <div class="checkout-summary-item">
+                <div>
+                    <span class="checkout-summary-item-name">${item.name}</span>
+                    <span class="checkout-summary-item-qty"> × ${item.qty}</span>
+                </div>
+                <span class="checkout-summary-item-price">₹${item.price * item.qty}</span>
+            </div>
+        `).join('');
+
+        if (shipping > 0) {
+            summaryHTML += `
+                <div class="checkout-summary-divider"></div>
+                <div class="checkout-summary-item">
+                    <span class="checkout-summary-item-name">Shipping</span>
+                    <span class="checkout-summary-item-price">₹${shipping}</span>
+                </div>
+            `;
+        }
+
+        summaryHTML += `
+            <div class="checkout-summary-divider"></div>
+            <div class="checkout-summary-total">
+                <span class="checkout-summary-total-label">Total</span>
+                <span class="checkout-summary-total-price">₹${total}</span>
+            </div>
+        `;
+
+        checkoutSummary.innerHTML = summaryHTML;
+
+        // Shipping info
+        if (shipping === 0) {
+            checkoutShippingInfo.innerHTML = '<span class="checkout-shipping-free">Free shipping applied</span>';
+        } else {
+            const remaining = SHIPPING_FREE_THRESHOLD - subtotal;
+            checkoutShippingInfo.textContent = `Add ₹${remaining} more for free shipping`;
+        }
+
+        checkoutPayAmount.textContent = `₹${total}`;
+
+        checkoutModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckout() {
+        checkoutModal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    checkoutClose.addEventListener('click', closeCheckout);
+    checkoutBackdrop.addEventListener('click', closeCheckout);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && checkoutModal.classList.contains('open')) {
+            closeCheckout();
+        }
+    });
+
+    doneBtn.addEventListener('click', () => {
+        // Reset cart
+        Object.keys(cart).forEach(id => { cart[id] = 0; });
+        getProductCards().forEach(card => {
+            card.querySelector('.qty-value').textContent = '0';
+            card.querySelector('.qty-picker').style.display = 'none';
+            card.querySelector('.qty-picker').classList.remove('has-items');
+            card.querySelector('.add-to-cart-btn').style.display = '';
+        });
+        updateCartBar();
+        closeCheckout();
+    });
+
+    retryBtn.addEventListener('click', () => {
+        stepFailure.style.display = 'none';
+        stepFailure.classList.add('checkout-step-hidden');
+        stepForm.style.display = '';
+        stepForm.classList.remove('checkout-step-hidden');
+    });
+
+    // --- Form Submit → Razorpay ---
+    checkoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        checkoutPayBtn.disabled = true;
+        checkoutPayBtn.textContent = 'Processing...';
+
+        const customer = {
+            name: document.getElementById('cust-name').value.trim(),
+            phone: document.getElementById('cust-phone').value.trim(),
+            address: document.getElementById('cust-address').value.trim(),
+            city: document.getElementById('cust-city').value.trim(),
+            state: document.getElementById('cust-state').value.trim(),
+            pincode: document.getElementById('cust-pincode').value.trim(),
+        };
+
+        const items = getCartItems();
+
+        try {
+            // 1. Create order on server
+            const res = await fetch('/api/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    items: items.map(i => ({ id: i.id, qty: i.qty })),
+                    customer,
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || 'Failed to create order');
+            }
+
+            const orderData = await res.json();
+
+            // 2. Open Razorpay checkout
+            const options = {
+                key: orderData.keyId,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: 'Zibbo Foods',
+                description: items.map(i => `${i.name} ×${i.qty}`).join(', '),
+                order_id: orderData.orderId,
+                prefill: {
+                    name: customer.name,
+                    contact: customer.phone,
+                },
+                theme: {
+                    color: '#2E7D32',
+                },
+                handler: async function (response) {
+                    // 3. Verify payment
+                    try {
+                        const verifyRes = await fetch('/api/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        });
+
+                        const verifyData = await verifyRes.json();
+
+                        if (verifyRes.ok && verifyData.verified) {
+                            showSuccess(verifyData.paymentId, orderData.amount);
+                        } else {
+                            showFailure('Payment verification failed. If amount was deducted, it will be refunded.');
+                        }
+                    } catch {
+                        showFailure('Could not verify payment. Please check your Razorpay dashboard or contact us on WhatsApp.');
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        resetPayBtn();
+                    },
+                },
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                showFailure(response.error.description || 'Payment failed. Please try again.');
+            });
+            rzp.open();
+        } catch (err) {
+            showFailure(err.message || 'Something went wrong. Please try again.');
+        }
+    });
+
+    function resetPayBtn() {
+        const items = getCartItems();
+        const subtotal = getCartSubtotal(items);
+        const shipping = getShipping(subtotal);
+        const total = subtotal + shipping;
+        checkoutPayBtn.disabled = false;
+        checkoutPayBtn.innerHTML = `Pay <span id="checkout-pay-amount">₹${total}</span>`;
+    }
+
+    function showSuccess(paymentId, amountPaise) {
+        stepForm.style.display = 'none';
+        stepForm.classList.add('checkout-step-hidden');
+        stepFailure.style.display = 'none';
+        stepFailure.classList.add('checkout-step-hidden');
+        stepSuccess.style.display = '';
+        stepSuccess.classList.remove('checkout-step-hidden');
+        successMsg.textContent = `Payment of ₹${(amountPaise / 100).toFixed(0)} received. Payment ID: ${paymentId}`;
+        resetPayBtn();
+    }
+
+    function showFailure(msg) {
+        stepForm.style.display = 'none';
+        stepForm.classList.add('checkout-step-hidden');
+        stepSuccess.style.display = 'none';
+        stepSuccess.classList.add('checkout-step-hidden');
+        stepFailure.style.display = '';
+        stepFailure.classList.remove('checkout-step-hidden');
+        failureMsg.textContent = msg;
+        resetPayBtn();
+    }
 });
