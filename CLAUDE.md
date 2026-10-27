@@ -57,11 +57,11 @@ zibbo/
 ├── refund-policy.html         # Refund & Cancellation Policy
 ├── shipping-policy.html       # Shipping & Delivery Policy
 ├── css/style.css              # All styles (responsive, animations, patterns)
-├── js/main.js                 # Nav, scroll, carousel, lightbox, cart, checkout, Razorpay
+├── js/main.js                 # Nav, scroll, carousel, lightbox, cart, checkout, Cashfree
 ├── api/
-│   ├── create-order.js        # Vercel serverless — creates Razorpay order (server-side price validation)
-│   └── verify-payment.js      # Vercel serverless — verifies Razorpay payment signature
-├── package.json               # Dependencies (razorpay SDK for serverless functions)
+│   ├── create-order.js        # Vercel serverless — creates Cashfree order (server-side price validation)
+│   └── verify-payment.js      # Vercel serverless — verifies payment via Cashfree Get Order API
+├── package.json               # Dependencies (cashfree-pg SDK for serverless functions)
 ├── assets/images/
 │   ├── hero/                  # Hero carousel images (6 product shots)
 │   │   ├── 5624.jpeg          # All packs overhead
@@ -110,7 +110,7 @@ Each product folder follows this structure:
 8. **Contact** — 3 cards: WhatsApp (link), Email (link), Instagram (link)
 9. **Footer** — Logo, tagline, nav links, policy links, social icons, FSSAI + GSTIN + business address
 10. **Sticky Cart Bar** — Fixed bottom, appears when items added, shows item count + subtotal + shipping info + Checkout button
-11. **Checkout Modal** — Order summary → address form (name, phone, address, city, state, pincode) → Razorpay payment → success/failure screen
+11. **Checkout Modal** — Order summary → address form (name, phone, address, city, state, pincode) → Cashfree payment → success/failure screen
 12. **Floating WhatsApp button** — Fixed bottom-right
 
 ### why-makhana.html (SEO Content)
@@ -125,7 +125,7 @@ Each product folder follows this structure:
 ### Policy Pages (terms, privacy, refund-policy, shipping-policy)
 
 - Professional legal content specific to Zibbo Foods
-- Required for Razorpay payment gateway activation
+- Required for payment gateway activation
 - Consistent navbar/footer across all pages
 
 ## Products (SKUs)
@@ -148,17 +148,18 @@ Each product folder follows this structure:
 1. User adds items via "Add to Cart" buttons on product cards
 2. Sticky cart bar shows at bottom with item count, subtotal, shipping
 3. "Checkout" opens modal with order summary + address form
-4. Form submit → `api/create-order.js` creates Razorpay order (server-side price validation)
-5. Razorpay popup opens (UPI, cards, wallets, netbanking)
-6. On success → `api/verify-payment.js` verifies HMAC-SHA256 signature
-7. Success/failure screen shown
+4. Form submit → `api/create-order.js` creates Cashfree order (server-side price validation)
+5. Cashfree checkout opens (redirect mode — UPI, cards, wallets, netbanking)
+6. On return → `api/verify-payment.js` fetches order status from Cashfree API
+7. Redirects back to site with success/failure → modal shown
 
-### Razorpay Setup (env vars on Vercel)
-- `RAZORPAY_KEY_ID` — from Razorpay dashboard (Settings → API Keys)
-- `RAZORPAY_KEY_SECRET` — from Razorpay dashboard
+### Cashfree Setup (env vars on Vercel)
+- `CASHFREE_APP_ID` — from Cashfree dashboard (Developers → API Keys)
+- `CASHFREE_SECRET_KEY` — from Cashfree dashboard
+- `CASHFREE_ENV` — `SANDBOX` for testing, `PRODUCTION` for live
 
 ### Order Management
-- All orders visible in Razorpay Dashboard with customer details in order notes
+- All orders visible in Cashfree Dashboard with customer details in order notes/tags
 - Manual fulfilment: check dashboard → pack → ship → WhatsApp tracking to customer
 
 ## Coming Soon
@@ -180,8 +181,8 @@ Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy To
 ## Tech Stack
 
 - Vanilla HTML5 / CSS3 / JavaScript (no frameworks)
-- Razorpay Checkout.js (client-side payment UI)
-- Razorpay Node.js SDK (server-side order creation)
+- Cashfree JS SDK (client-side checkout)
+- Cashfree PG Node.js SDK (server-side order creation & verification)
 - Vercel Serverless Functions (Node.js)
 - Google Fonts (Poppins)
 - SVG icons (inline, no external icon library)
@@ -209,6 +210,6 @@ Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy To
 python3 -m http.server 8080
 # Open http://localhost:8080
 
-# Note: Razorpay checkout and API calls won't work locally
-# (serverless functions only run on Vercel). Test with Razorpay test keys after deploy.
+# Note: Cashfree checkout and API calls won't work locally
+# (serverless functions only run on Vercel). Test with Cashfree sandbox keys after deploy.
 ```

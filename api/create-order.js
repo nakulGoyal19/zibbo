@@ -1,15 +1,15 @@
-const Razorpay = require('razorpay');
+const { Cashfree } = require('cashfree-pg');
 
 // Product catalog — single source of truth for server-side price validation
 const PRODUCTS = {
-  'mini-100g': { name: 'Makhana Mini Pack', weight: '100g', price: 12000 },       // paise
-  'gold-250g': { name: 'Gold Makhana', weight: '250g', price: 32500 },
-  'handle-250g': { name: 'Makhana Handle Pack', weight: '250g', price: 27500 },
-  'premium-250g': { name: 'Premium Makhana', weight: '250g', price: 40000 },
+  'mini-100g': { name: 'Makhana Mini Pack', weight: '100g', price: 120 },
+  'gold-250g': { name: 'Gold Makhana', weight: '250g', price: 325 },
+  'handle-250g': { name: 'Makhana Handle Pack', weight: '250g', price: 275 },
+  'premium-250g': { name: 'Premium Makhana', weight: '250g', price: 400 },
 };
 
-const SHIPPING_FREE_THRESHOLD = 50000; // ₹500 in paise
-const SHIPPING_CHARGE = 5000;          // ₹50 in paise
+const SHIPPING_FREE_THRESHOLD = 500;
+const SHIPPING_CHARGE = 50;
 
 module.exports = async (req, res) => {
   // CORS
@@ -51,33 +51,49 @@ module.exports = async (req, res) => {
     const shipping = subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_CHARGE;
     const total = subtotal + shipping;
 
-    // Create Razorpay order
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
+    // Initialize Cashfree
+    const env = process.env.CASHFREE_ENV === 'PRODUCTION'
+      ? Cashfree.PRODUCTION
+      : Cashfree.SANDBOX;
 
-    const order = await razorpay.orders.create({
-      amount: total,
-      currency: 'INR',
-      notes: {
-        customer_name: customer.name,
+    const cashfree = new Cashfree(env, process.env.CASHFREE_APP_ID, process.env.CASHFREE_SECRET_KEY);
+
+    // Generate unique order ID
+    const orderId = `ZIBBO_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    // Create Cashfree order
+    const request = {
+      order_amount: total,
+      order_currency: 'INR',
+      order_id: orderId,
+      customer_details: {
+        customer_id: `cust_${customer.phone}`,
         customer_phone: customer.phone,
-        customer_address: `${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}`,
-        items: orderItems.map(i => `${i.name} x${i.qty}`).join(', '),
+        customer_name: customer.name,
       },
-    });
+      order_meta: {
+        return_url: `${req.headers.origin || 'https://zibbofoods.com'}/api/verify-payment?order_id={order_id}`,
+      },
+      order_note: `${orderItems.map(i => `${i.name} x${i.qty}`).join(', ')} | ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}`,
+      order_tags: {
+        delivery_address: `${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}`,
+        customer_phone: customer.phone,
+      },
+    };
+
+    const response = await cashfree.PGCreateOrder(request);
+    const orderData = response.data;
 
     return res.status(200).json({
-      orderId: order.id,
+      orderId: orderData.order_id,
+      paymentSessionId: orderData.payment_session_id,
       amount: total,
       subtotal,
       shipping,
       currency: 'INR',
-      keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (err) {
-    console.error('create-order error:', err);
+    console.error('create-order error:', err?.response?.data || err);
     return res.status(500).json({ error: 'Failed to create order' });
   }
 };

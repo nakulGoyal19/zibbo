@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stepForm.classList.remove('checkout-step-hidden');
     });
 
-    // --- Form Submit → Razorpay ---
+    // --- Form Submit → Cashfree ---
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         checkoutPayBtn.disabled = true;
@@ -481,61 +481,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const orderData = await res.json();
 
-            // 2. Open Razorpay checkout
-            const options = {
-                key: orderData.keyId,
+            // Store order info for verification after redirect
+            sessionStorage.setItem('zibbo_pending_order', JSON.stringify({
+                orderId: orderData.orderId,
                 amount: orderData.amount,
-                currency: orderData.currency,
-                name: 'Zibbo Foods',
-                description: items.map(i => `${i.name} ×${i.qty}`).join(', '),
-                order_id: orderData.orderId,
-                prefill: {
-                    name: customer.name,
-                    contact: customer.phone,
-                },
-                theme: {
-                    color: '#2E7D32',
-                },
-                handler: async function (response) {
-                    // 3. Verify payment
-                    try {
-                        const verifyRes = await fetch('/api/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                            }),
-                        });
+            }));
 
-                        const verifyData = await verifyRes.json();
+            // 2. Open Cashfree checkout
+            const cashfree = Cashfree({ mode: 'production' });
 
-                        if (verifyRes.ok && verifyData.verified) {
-                            showSuccess(verifyData.paymentId, orderData.amount);
-                        } else {
-                            showFailure('Payment verification failed. If amount was deducted, it will be refunded.');
-                        }
-                    } catch {
-                        showFailure('Could not verify payment. Please check your Razorpay dashboard or contact us on WhatsApp.');
-                    }
-                },
-                modal: {
-                    ondismiss: function () {
-                        resetPayBtn();
-                    },
-                },
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.on('payment.failed', function (response) {
-                showFailure(response.error.description || 'Payment failed. Please try again.');
+            cashfree.checkout({
+                paymentSessionId: orderData.paymentSessionId,
+                redirectTarget: '_self',
             });
-            rzp.open();
+
+            // Note: For redirect mode, the page will navigate away.
+            // User returns to /api/verify-payment which redirects to /?payment=success/failed
+            // The handlePaymentReturn() function below handles showing success/failure on return.
+
         } catch (err) {
             showFailure(err.message || 'Something went wrong. Please try again.');
         }
     });
+
+    // --- Handle return from Cashfree redirect ---
+    function handlePaymentReturn() {
+        const params = new URLSearchParams(window.location.search);
+        const paymentStatus = params.get('payment');
+        const orderId = params.get('order_id');
+        const amount = params.get('amount');
+
+        if (!paymentStatus) return;
+
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+
+        if (paymentStatus === 'success') {
+            // Reset cart
+            Object.keys(cart).forEach(id => { cart[id] = 0; });
+            getProductCards().forEach(card => {
+                card.querySelector('.qty-value').textContent = '0';
+                card.querySelector('.qty-picker').style.display = 'none';
+                card.querySelector('.qty-picker').classList.remove('has-items');
+                card.querySelector('.add-to-cart-btn').style.display = '';
+            });
+            updateCartBar();
+
+            // Show success modal
+            checkoutModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            showSuccess(orderId, parseFloat(amount) * 100);
+        } else {
+            checkoutModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            showFailure('Payment was not completed. Please try again or contact us on WhatsApp.');
+        }
+
+        sessionStorage.removeItem('zibbo_pending_order');
+    }
+
+    handlePaymentReturn();
 
     function resetPayBtn() {
         const items = getCartItems();
