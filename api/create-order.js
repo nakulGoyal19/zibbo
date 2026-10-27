@@ -69,6 +69,7 @@ module.exports = async (req, res) => {
         customer_id: `cust_${customer.phone}`,
         customer_phone: customer.phone,
         customer_name: customer.name,
+        ...(customer.email && { customer_email: customer.email }),
       },
       order_meta: {
         return_url: `${req.headers.origin || 'https://zibbofoods.com'}/api/verify-payment?order_id={order_id}`,

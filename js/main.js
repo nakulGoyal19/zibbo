@@ -455,6 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const customer = {
             name: document.getElementById('cust-name').value.trim(),
             phone: document.getElementById('cust-phone').value.trim(),
+            email: document.getElementById('cust-email').value.trim() || undefined,
             address: document.getElementById('cust-address').value.trim(),
             city: document.getElementById('cust-city').value.trim(),
             state: document.getElementById('cust-state').value.trim(),
