@@ -1090,7 +1090,7 @@ h1, h2, h3, h4 {
 
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin-bottom: 48px;
 }
@@ -1136,9 +1136,9 @@ h1, h2, h3, h4 {
 
 .product-card-img {
     width: 100%;
-    height: 260px;
+    aspect-ratio: 3 / 5;
     overflow: hidden;
-    background: #f5f5f5;
+    background: #ffffff;
     display: flex;
     gap: 0;
 }
@@ -1151,17 +1151,18 @@ h1, h2, h3, h4 {
     min-width: 0;
 }
 
+.product-card-img img:only-of-type {
+    width: 100%;
+    flex: unset;
+}
+
 .product-card-img img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     object-position: center center;
     transition: transform 0.5s ease;
-}
-
-.product-card-img img:only-child {
-    width: 100%;
-    flex: unset;
+    padding: 12px;
 }
 
 .product-card:hover .product-card-img img {
@@ -1169,28 +1170,28 @@ h1, h2, h3, h4 {
 }
 
 .product-card-body {
-    padding: 16px 20px;
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
 .product-card-body h3 {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .product-card-sub {
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .product-card-desc {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     flex: 1;
 }
 
@@ -1198,14 +1199,14 @@ h1, h2, h3, h4 {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 14px;
+    gap: 4px;
+    margin-bottom: 10px;
 }
 
 .product-card-tags li {
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    padding: 4px 12px;
+    padding: 3px 8px;
     border-radius: 50px;
     background: var(--green-pale);
     color: var(--green-mid);
@@ -1232,7 +1233,7 @@ h1, h2, h3, h4 {
 }
 
 .product-price {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: var(--text-dark);
     line-height: 1;
@@ -1671,7 +1672,13 @@ h1, h2, h3, h4 {
 
 /* Move WhatsApp float up when cart bar is visible */
 .cart-bar.visible ~ .whatsapp-float {
-    bottom: 80px;
+    bottom: 76px;
+}
+
+@media (max-width: 768px) {
+    .cart-bar.visible ~ .whatsapp-float {
+        bottom: 68px;
+    }
 }
 
 /* --- Checkout Modal --- */
@@ -1865,9 +1872,30 @@ h1, h2, h3, h4 {
     border-color: #C62828;
 }
 
+.checkout-delivery-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--orange-light);
+    border-radius: 8px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+.checkout-delivery-info svg {
+    flex-shrink: 0;
+    color: var(--orange);
+}
+
+.checkout-delivery-info span {
+    font-size: 0.8rem;
+    color: var(--text-body);
+    line-height: 1.4;
+}
+
 .checkout-pay-btn {
     width: 100%;
-    margin-top: 8px;
     padding: 14px;
     font-size: 1.05rem;
 }
@@ -1944,15 +1972,26 @@ h1, h2, h3, h4 {
 }
 
 /* --- Responsive --- */
+
+/* Hide description on desktop/tablet — compact cards */
+@media (min-width: 769px) {
+    .product-card-desc {
+        display: none;
+    }
+}
+
 @media (max-width: 1024px) {
     .hero h1 {
         font-size: 3rem;
     }
 
-    .pillars-grid {
+    .products-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .pillars-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -1970,13 +2009,13 @@ h1, h2, h3, h4 {
 
     .products-grid {
         grid-template-columns: 1fr;
-        max-width: 420px;
+        max-width: 340px;
         margin-left: auto;
         margin-right: auto;
     }
 
     .product-card-img {
-        height: 280px;
+        aspect-ratio: 3 / 4;
     }
 
     .whatsapp-cta-banner {
@@ -2076,6 +2115,19 @@ h1, h2, h3, h4 {
 
     .policy-page h1 {
         font-size: 1.6rem;
+    }
+
+    /* WhatsApp float — smaller and higher on mobile */
+    .whatsapp-float {
+        width: 48px;
+        height: 48px;
+        bottom: 20px;
+        right: 16px;
+    }
+
+    .whatsapp-float svg {
+        width: 22px;
+        height: 22px;
     }
 
     /* Coming Soon banner mobile */
