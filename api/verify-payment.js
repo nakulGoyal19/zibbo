@@ -1,28 +1,31 @@
-const { Cashfree } = require('cashfree-pg');
-
 module.exports = async (req, res) => {
-  // Handle both GET (redirect return) and POST (JS verification)
   const orderId = req.method === 'GET' ? req.query.order_id : req.body?.order_id;
 
-  // If GET request (redirect from Cashfree), redirect to site with order_id
+  const isProd = process.env.CASHFREE_ENV === 'PRODUCTION';
+  const baseUrl = isProd
+    ? 'https://api.cashfree.com/pg'
+    : 'https://sandbox.cashfree.com/pg';
+
+  // GET request — redirect return from Cashfree checkout
   if (req.method === 'GET' && orderId) {
-    // Verify order status then redirect to main site with result
     try {
-      const env = process.env.CASHFREE_ENV === 'PRODUCTION'
-        ? Cashfree.PRODUCTION
-        : Cashfree.SANDBOX;
+      const response = await fetch(`${baseUrl}/orders/${orderId}`, {
+        headers: {
+          'x-client-id': process.env.CASHFREE_APP_ID,
+          'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+          'x-api-version': '2023-08-01',
+        },
+      });
 
-      const cashfree = new Cashfree(env, process.env.CASHFREE_APP_ID, process.env.CASHFREE_SECRET_KEY);
-      const response = await cashfree.PGFetchOrder(orderId);
-      const order = response.data;
+      const order = await response.json();
 
-      if (order.order_status === 'PAID') {
+      if (response.ok && order.order_status === 'PAID') {
         return res.redirect(`/?payment=success&order_id=${orderId}&amount=${order.order_amount}`);
       } else {
         return res.redirect(`/?payment=failed&order_id=${orderId}`);
       }
     } catch (err) {
-      console.error('verify redirect error:', err?.response?.data || err);
+      console.error('verify redirect error:', err);
       return res.redirect(`/?payment=failed&order_id=${orderId || 'unknown'}`);
     }
   }
@@ -39,15 +42,17 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Missing order_id' });
     }
 
-    const env = process.env.CASHFREE_ENV === 'PRODUCTION'
-      ? Cashfree.PRODUCTION
-      : Cashfree.SANDBOX;
+    const response = await fetch(`${baseUrl}/orders/${orderId}`, {
+      headers: {
+        'x-client-id': process.env.CASHFREE_APP_ID,
+        'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+        'x-api-version': '2023-08-01',
+      },
+    });
 
-    const cashfree = new Cashfree(env, process.env.CASHFREE_APP_ID, process.env.CASHFREE_SECRET_KEY);
-    const response = await cashfree.PGFetchOrder(orderId);
-    const order = response.data;
+    const order = await response.json();
 
-    if (order.order_status === 'PAID') {
+    if (response.ok && order.order_status === 'PAID') {
       return res.status(200).json({
         verified: true,
         orderId: order.order_id,
@@ -62,7 +67,7 @@ module.exports = async (req, res) => {
       });
     }
   } catch (err) {
-    console.error('verify-payment error:', err?.response?.data || err);
+    console.error('verify-payment error:', err);
     return res.status(500).json({ error: 'Verification failed' });
   }
 };

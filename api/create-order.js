@@ -51,18 +51,17 @@ module.exports = async (req, res) => {
     const shipping = subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_CHARGE;
     const total = subtotal + shipping;
 
-    // Initialize Cashfree
-    const env = process.env.CASHFREE_ENV === 'PRODUCTION'
-      ? Cashfree.PRODUCTION
-      : Cashfree.SANDBOX;
-
-    const cashfree = new Cashfree(env, process.env.CASHFREE_APP_ID, process.env.CASHFREE_SECRET_KEY);
-
     // Generate unique order ID
     const orderId = `ZIBBO_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // Create Cashfree order
-    const request = {
+    // Determine environment
+    const isProd = process.env.CASHFREE_ENV === 'PRODUCTION';
+    const baseUrl = isProd
+      ? 'https://api.cashfree.com/pg'
+      : 'https://sandbox.cashfree.com/pg';
+
+    // Create order via REST API directly (more reliable than SDK version mismatches)
+    const orderRequest = {
       order_amount: total,
       order_currency: 'INR',
       order_id: orderId,
@@ -81,8 +80,23 @@ module.exports = async (req, res) => {
       },
     };
 
-    const response = await cashfree.PGCreateOrder(request);
-    const orderData = response.data;
+    const response = await fetch(`${baseUrl}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-client-id': process.env.CASHFREE_APP_ID,
+        'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+        'x-api-version': '2023-08-01',
+      },
+      body: JSON.stringify(orderRequest),
+    });
+
+    const orderData = await response.json();
+
+    if (!response.ok) {
+      console.error('Cashfree API error:', JSON.stringify(orderData));
+      return res.status(500).json({ error: orderData.message || 'Failed to create order' });
+    }
 
     return res.status(200).json({
       orderId: orderData.order_id,
@@ -91,10 +105,10 @@ module.exports = async (req, res) => {
       subtotal,
       shipping,
       currency: 'INR',
-      cfMode: process.env.CASHFREE_ENV === 'PRODUCTION' ? 'production' : 'sandbox',
+      cfMode: isProd ? 'production' : 'sandbox',
     });
   } catch (err) {
-    console.error('create-order error:', err?.response?.data || err);
-    return res.status(500).json({ error: 'Failed to create order' });
+    console.error('create-order error:', err);
+    return res.status(500).json({ error: 'Failed to create order: ' + (err.message || 'Unknown error') });
   }
 };
