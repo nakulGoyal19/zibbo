@@ -63,18 +63,12 @@ zibbo/
 │   └── verify-payment.js      # Vercel serverless — verifies payment via Cashfree Get Order API
 ├── package.json               # Dependencies (cashfree-pg SDK for serverless functions)
 ├── assets/images/
-│   ├── hero/                  # Hero carousel images (6 product shots)
-│   │   ├── 5624.jpeg          # All packs overhead
-│   │   ├── 5625.jpeg          # All packs standing (default)
-│   │   ├── 5627.jpeg          # Packs against wall
-│   │   ├── 5629.jpeg          # Packs arranged
-│   │   ├── 5631.jpeg          # Packaging machine
-│   │   └── 5633.jpeg          # Packaging process
+│   ├── hero/                  # Legacy hero images (not currently used in carousel)
 │   ├── products/
-│   │   ├── red-standup/       # Makhana Mini Pack (100g)
-│   │   ├── gold/              # Gold Makhana (250g)
-│   │   ├── red-handle/        # Makhana Handle Pack (250g)
-│   │   └── premium/           # Premium Makhana (250g)
+│   │   ├── red-standup/       # Makhana Mini Pack (100g) — 1-front.png, 2-back.png
+│   │   ├── gold/              # Gold Makhana (250g) — 1-front.jpeg + gallery
+│   │   ├── red-handle/        # Makhana Handle Pack (250g) — 1-front.png, 2-back.png
+│   │   └── premium/           # Premium Makhana (250g) — 1-front.jpeg + gallery
 │   ├── zibbo-logo.jpeg        # Brand logo
 │   ├── favicon-32.png         # Browser tab icon 32x32
 │   ├── favicon-16.png         # Browser tab icon 16x16
@@ -87,19 +81,19 @@ zibbo/
 ### Product Image Pattern
 
 Each product folder follows this structure:
-- `1-front.jpeg` — Front card image (no rotation)
-- `2-front.jpeg` — Second card image (rotated 90° right for desktop)
-- `2-front-mobile.jpeg` — Non-rotated version for mobile (where applicable)
-- `3-gallery.jpeg` to `6-gallery.jpeg` — All non-rotated gallery/lightbox images
+- `1-front.png` or `1-front.jpeg` — Front pack image (main card image, also used in hero carousel for red packs)
+- `2-back.png` — Back panel image (shown in lightbox gallery)
+- `3-gallery.jpeg` to `6-gallery.jpeg` — Additional gallery/lightbox images (gold/premium only)
 
 ## Website Pages
 
 ### index.html (Main Page)
 
 1. **Navbar** — Fixed top, logo + 4 links (About, Products, Why Makhana, Contact) + "Shop Now" button, mobile hamburger
-2. **Hero** — "Now Available" pulse badge, headline, subtitle, two CTAs ("Shop Now" primary, "WhatsApp" secondary outline), auto-rotating image carousel (6 images, 3s interval)
-3. **Products** — 4 product cards in 2×2 grid with:
-   - Dual-image preview, lightbox gallery, badges, tags
+2. **Hero** — "Now Available" pulse badge, headline, subtitle, two CTAs ("Shop Now" primary, "WhatsApp" secondary outline), auto-rotating image carousel (2 red pack images, 3s interval, click adds product to cart & scrolls to card)
+3. **Products** — 4 product cards in 4-column portrait grid (2-col tablet, 1-col mobile) with:
+   - Single full-width front image, lightbox gallery on click, badges, tags
+   - Description hidden on desktop for compact cards, visible on mobile
    - Pricing (MRP strikethrough + selling price + discount badge)
    - "Add to Cart" button → transforms to qty picker (−/+) on click
    - Max 100 per product
@@ -110,7 +104,7 @@ Each product folder follows this structure:
 8. **Contact** — 3 cards: WhatsApp (link), Email (link), Instagram (link)
 9. **Footer** — Logo, tagline, nav links, policy links, social icons, FSSAI + GSTIN + business address
 10. **Sticky Cart Bar** — Fixed bottom, appears when items added, shows item count + subtotal + shipping info + Checkout button
-11. **Checkout Modal** — Order summary → address form (name, phone, address, city, state, pincode) → Cashfree payment → success/failure screen
+11. **Checkout Modal** — Order summary → address form (name, phone, email optional, address, city, state, pincode) → delivery estimate (3-7 days) → Cashfree payment → success/failure screen
 12. **Floating WhatsApp button** — Fixed bottom-right
 
 ### why-makhana.html (SEO Content)
@@ -132,10 +126,10 @@ Each product folder follows this structure:
 
 | Pack | Name | Format | Weight | MRP | Selling | Grade |
 |------|------|--------|--------|-----|---------|-------|
-| Red Mini | Makhana Mini Pack | Zip-lock standup pouch | 100g | ₹299 | ₹120 | Regular |
-| Gold | Gold Makhana | Zip-lock standup pouch | 250g | ₹699 | ₹325 | Jumbo, handpicked |
-| Red Handle | Makhana Handle Pack | Handle packet | 250g | ₹600 | ₹275 | Regular |
-| Premium | Premium Makhana | Zip-lock standup pouch | 250g | ₹899 | ₹400 | Largest, most premium, handpicked |
+| Red Mini | Makhana Mini Pack | Zip-lock standup pouch | 100g | ₹299 | ₹149 | Regular |
+| Gold | Gold Makhana | Zip-lock standup pouch | 250g | ₹699 | ₹349 | Jumbo, handpicked |
+| Red Handle | Makhana Handle Pack | Handle packet | 250g | ₹600 | ₹299 | Regular |
+| Premium | Premium Makhana | Zip-lock standup pouch | 250g | ₹899 | ₹399 | Largest, most premium, handpicked |
 
 ## Shipping & Returns
 
@@ -193,8 +187,9 @@ Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy To
 ## Features
 
 - Auto-scroll from hero to products after 2.5s (cancelled if user interacts)
-- Hero image carousel (6 images, 3s auto-rotate, crossfade)
+- Hero image carousel (2 red pack images, 3s auto-rotate, crossfade, click to add & scroll)
 - Product image lightbox with keyboard/touch/swipe navigation
+- 4-column portrait product grid (2-col tablet, 1-col mobile)
 - Add to Cart → qty picker transformation
 - Sticky cart bar with live totals and shipping calculation
 - Checkout modal with address form + Razorpay payment
