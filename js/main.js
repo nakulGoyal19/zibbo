@@ -219,8 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // CART & CHECKOUT
     // =============================================
 
-    const SHIPPING_FREE_THRESHOLD = 0;  // TODO: restore to 500 after testing
-    const SHIPPING_CHARGE = 0;          // TODO: restore to 50 after testing
+    const SHIPPING_FREE_THRESHOLD = 500;
+    const SHIPPING_CHARGE = 50;
     const MAX_QTY = 100;
 
     // Cart state: { productId: qty }
