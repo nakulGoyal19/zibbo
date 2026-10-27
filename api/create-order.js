@@ -2,14 +2,14 @@ const { Cashfree } = require('cashfree-pg');
 
 // Product catalog — single source of truth for server-side price validation
 const PRODUCTS = {
-  'mini-100g': { name: 'Makhana Mini Pack', weight: '100g', price: 120 },
-  'gold-250g': { name: 'Gold Makhana', weight: '250g', price: 325 },
-  'handle-250g': { name: 'Makhana Handle Pack', weight: '250g', price: 275 },
-  'premium-250g': { name: 'Premium Makhana', weight: '250g', price: 400 },
+  'mini-100g': { name: 'Makhana Mini Pack', weight: '100g', price: 10 },  // TODO: restore to 149 after testing
+  'gold-250g': { name: 'Gold Makhana', weight: '250g', price: 349 },
+  'handle-250g': { name: 'Makhana Handle Pack', weight: '250g', price: 299 },
+  'premium-250g': { name: 'Premium Makhana', weight: '250g', price: 399 },
 };
 
-const SHIPPING_FREE_THRESHOLD = 500;
-const SHIPPING_CHARGE = 50;
+const SHIPPING_FREE_THRESHOLD = 0;  // TODO: restore to 500 after testing (free shipping for all during test)
+const SHIPPING_CHARGE = 0;
 
 module.exports = async (req, res) => {
   // CORS
