@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
 
             // 2. Open Cashfree checkout
-            const cashfree = Cashfree({ mode: 'production' });
+            const cashfree = Cashfree({ mode: orderData.cfMode || 'production' });
 
             cashfree.checkout({
                 paymentSessionId: orderData.paymentSessionId,

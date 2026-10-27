@@ -91,6 +91,7 @@ module.exports = async (req, res) => {
       subtotal,
       shipping,
       currency: 'INR',
+      cfMode: process.env.CASHFREE_ENV === 'PRODUCTION' ? 'production' : 'sandbox',
     });
   } catch (err) {
     console.error('create-order error:', err?.response?.data || err);
