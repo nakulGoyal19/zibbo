@@ -909,23 +909,25 @@ h1, h2, h3, h4 {
         url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='white' fill-opacity='0.04'/%3E%3C/svg%3E") repeat,
         var(--green-dark);
     color: var(--white);
-    padding: 60px 0 24px;
+    padding: 40px 0 24px;
     border-top: 3px solid var(--green-light);
 }
 
 .footer-content {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding-bottom: 32px;
+    text-align: center;
+    gap: 16px;
+    padding-bottom: 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .footer-logo {
     height: 40px;
     width: auto;
-    margin-bottom: 8px;
+    margin: 0 auto 8px;
     border-radius: 6px;
 }
 
@@ -936,12 +938,14 @@ h1, h2, h3, h4 {
 
 .footer-links {
     display: flex;
-    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 24px;
 }
 
 .footer-links a {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 400;
 }
 
@@ -964,24 +968,33 @@ h1, h2, h3, h4 {
     transform: translateY(-2px);
 }
 
+.footer-links-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
 .footer-policy-links {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 16px;
 }
 
 .footer-policy-links a {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
+    opacity: 0.6;
 }
 
 .footer-legal {
     text-align: center;
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 16px;
+    padding: 12px 0;
+    margin-bottom: 12px;
 }
 
 .footer-legal p {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: rgba(255, 255, 255, 0.5);
     line-height: 1.6;
 }
@@ -1549,6 +1562,118 @@ h1, h2, h3, h4 {
     color: var(--green-dark);
 }
 
+/* --- Reviews Section --- */
+.reviews {
+    padding: 80px 0;
+    background: var(--white);
+}
+
+.reviews-rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 8px 20px;
+    background: var(--orange-light);
+    border-radius: 50px;
+}
+
+.reviews-stars {
+    color: var(--orange);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.reviews-score {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.review-card {
+    background: var(--green-bg);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all var(--transition);
+}
+
+.review-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.review-stars {
+    color: var(--orange);
+    font-size: 1rem;
+    letter-spacing: 2px;
+}
+
+.review-text {
+    font-size: 0.9rem;
+    color: var(--text-body);
+    line-height: 1.7;
+    font-style: italic;
+    flex: 1;
+}
+
+.review-author {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.review-author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.review-author-info strong {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.review-author-info span {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.review-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--green-mid);
+    background: var(--green-pale);
+    padding: 4px 10px;
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.review-order {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-top: 8px;
+    border-top: 1px solid var(--green-pale);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .reviews-grid {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+}
+
 /* --- Add to Cart & Quantity Picker --- */
 .product-actions {
     display: flex;
@@ -2086,23 +2211,6 @@ h1, h2, h3, h4 {
 
     .contact-grid {
         grid-template-columns: 1fr;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        gap: 24px;
-        text-align: center;
-    }
-
-    .footer-links {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .footer-policy-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 12px;
     }
 
     .footer-social {

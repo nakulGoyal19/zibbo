@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add fade-in class to animated elements
     const animatedElements = document.querySelectorAll(
-        '.about-card, .product-card, .pillar-card, .contact-card, .whatsapp-cta-banner'
+        '.about-card, .product-card, .pillar-card, .contact-card, .whatsapp-cta-banner, .review-card'
     );
     animatedElements.forEach(el => {
         el.classList.add('fade-in');
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Stagger animation for grid items
-    document.querySelectorAll('.about-grid, .products-grid, .pillars-grid, .contact-grid').forEach(grid => {
+    document.querySelectorAll('.about-grid, .products-grid, .pillars-grid, .contact-grid, .reviews-grid').forEach(grid => {
         const cards = grid.children;
         Array.from(cards).forEach((card, index) => {
             card.style.transitionDelay = `${index * 0.1}s`;
