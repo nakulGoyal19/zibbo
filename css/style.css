@@ -136,7 +136,7 @@ h1, h2, h3, h4 {
 /* --- Navbar --- */
 .navbar {
     position: fixed;
-    top: 0;
+    top: 34px;
     left: 0;
     right: 0;
     z-index: 1000;
@@ -222,7 +222,7 @@ h1, h2, h3, h4 {
 .mobile-menu {
     display: none;
     position: fixed;
-    top: 72px;
+    top: 106px;
     left: 0;
     right: 0;
     background: var(--white);
@@ -250,7 +250,7 @@ h1, h2, h3, h4 {
 
 /* --- Hero --- */
 .hero {
-    padding: 140px 0 80px;
+    padding: 170px 0 80px;
     background: linear-gradient(135deg, var(--green-bg) 0%, var(--white) 50%, var(--orange-light) 100%);
     min-height: 100vh;
     display: flex;
@@ -1445,6 +1445,11 @@ h1, h2, h3, h4 {
 
 /* --- Offer Bar --- */
 .offer-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
     background: linear-gradient(90deg, #E65100, #F9A825);
     color: var(--white);
     text-align: center;
@@ -2287,7 +2292,7 @@ h1, h2, h3, h4 {
     }
 
     .hero {
-        padding: 110px 0 60px;
+        padding: 140px 0 60px;
         min-height: auto;
     }
 
