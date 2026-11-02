@@ -73,6 +73,8 @@ zibbo/
 │   ├── favicon-32.png         # Browser tab icon 32x32
 │   ├── favicon-16.png         # Browser tab icon 16x16
 │   └── apple-touch-icon.png   # iOS home screen icon 180x180
+├── sitemap.xml                # Sitemap for Google Search Console
+├── robots.txt                 # Crawler directives + sitemap reference
 ├── .gitignore
 ├── CLAUDE.md                  # This file
 └── README.md
@@ -89,8 +91,9 @@ Each product folder follows this structure:
 
 ### index.html (Main Page)
 
-1. **Navbar** — Fixed top, logo + 4 links (About, Products, Why Makhana, Contact) + "Shop Now" button, mobile hamburger
-2. **Hero** — "Now Available" pulse badge, headline, subtitle, two CTAs ("Shop Now" primary, "WhatsApp" secondary outline), auto-rotating image carousel (2 red pack images, 3s interval, click adds product to cart & scrolls to card)
+0. **Offer Bar** — Fixed top banner for time-limited offers (e.g. Diwali 10% OFF). Auto-hides after expiry date via JS date check. All offer elements use `.diwali-offer` class and `style="display:none"` default, JS reveals them if `new Date() < offerEnd`.
+1. **Navbar** — Fixed top (shifts down 28px when offer bar active), logo + 4 links (About, Products, Why Makhana, Contact) + "Shop Now" button, mobile hamburger
+2. **Hero** — Diwali badge (or "Now Available" when no offer), keyword-rich H1 "Premium Makhana Delivered to You", subtitle with pricing, two CTAs ("Shop Now" primary, "WhatsApp" secondary), coupon code text, auto-rotating image carousel (all 4 pack images, 3s interval, click adds product to cart & scrolls to card)
 3. **Products** — 4 product cards in 4-column portrait grid (2-col tablet, 1-col mobile) with:
    - Single full-width front image, lightbox gallery on click, badges, tags
    - Description hidden on desktop for compact cards, visible on mobile
@@ -99,13 +102,15 @@ Each product folder follows this structure:
    - Max 100 per product
 4. **Flavoured Makhana — Coming Soon** — Teaser with 9 flavour tags (Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy Tomato, Magic Masala, Smokey Barbeque, Lemon Chilli)
 5. **WhatsApp CTA Banner** — Secondary option for bulk/wholesale orders
-6. **About** — 3 cards: Our Story, Our Mission, Made in India
-7. **Why Zibbo** — 4 pillar cards with numbered headers and top-border hover effect
-8. **Contact** — 3 cards: WhatsApp (link), Email (link), Instagram (link)
-9. **Footer** — Logo, tagline, nav links, policy links, social icons, FSSAI + GSTIN + business address
-10. **Sticky Cart Bar** — Fixed bottom, appears when items added, shows item count + subtotal + shipping info + Checkout button
-11. **Checkout Modal** — Order summary → address form (name, phone, email optional, address, city, state, pincode) → delivery estimate (3-7 days) → Cashfree payment → success/failure screen
-12. **Floating WhatsApp button** — Fixed bottom-right
+6. **Reviews** — 4.9/5 rating badge, 3 customer review cards with order badges
+7. **About** — 3 cards: Our Story, Our Mission, Made in India
+8. **Why Zibbo** — 4 pillar cards with numbered headers and top-border hover effect
+9. **FAQ** — 6 expandable accordion questions (also in JSON-LD FAQPage schema for Google)
+10. **Contact** — 3 cards: WhatsApp (link), Email (link), Instagram (link)
+11. **Footer** — Centered stacked layout: logo, nav links, policy links, social icons, FSSAI + GSTIN + address
+12. **Sticky Cart Bar** — Fixed bottom, appears when items added, shows item count + subtotal + shipping + offer tag + Checkout button
+13. **Checkout Modal** — Order summary → offer reminder with coupon code → address form (name, phone, email optional, address, city, state, pincode) → delivery estimate (3-7 days) → Cashfree payment → success/failure screen
+14. **Floating WhatsApp button** — Fixed bottom-right, smaller on mobile, shifts up when cart bar visible
 
 ### why-makhana.html (SEO Content)
 
@@ -152,9 +157,16 @@ Each product folder follows this structure:
 - `CASHFREE_SECRET_KEY` — from Cashfree dashboard
 - `CASHFREE_ENV` — `SANDBOX` for testing, `PRODUCTION` for live
 
+### Offers / Coupons
+- Coupons are configured in Cashfree dashboard (not in our code)
+- Site shows offer banners with coupon code — user applies it on Cashfree payment page
+- Time-limited offers use JS date check: all elements with `.diwali-offer` class auto-show/hide
+- When offer expires, "Now Available" badge shows instead, navbar reverts to top position
+
 ### Order Management
 - All orders visible in Cashfree Dashboard with customer details in order notes/tags
-- Manual fulfilment: check dashboard → pack → ship → WhatsApp tracking to customer
+- Cashfree sends email notification on each successful payment
+- Manual fulfilment: check dashboard/email → pack → ship → WhatsApp tracking to customer
 
 ## Coming Soon
 
@@ -176,7 +188,7 @@ Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy To
 
 - Vanilla HTML5 / CSS3 / JavaScript (no frameworks)
 - Cashfree JS SDK (client-side checkout)
-- Cashfree PG Node.js SDK (server-side order creation & verification)
+- Cashfree REST API (server-side order creation & verification)
 - Vercel Serverless Functions (Node.js)
 - Google Fonts (Poppins)
 - SVG icons (inline, no external icon library)
@@ -187,16 +199,20 @@ Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy To
 ## Features
 
 - Auto-scroll from hero to products after 2.5s (cancelled if user interacts)
-- Hero image carousel (2 red pack images, 3s auto-rotate, crossfade, click to add & scroll)
+- Time-limited offer banners with auto-expiry (JS date check, `.diwali-offer` class pattern)
+- Hero image carousel (all 4 pack images, 3s auto-rotate, crossfade, click to add & scroll)
 - Product image lightbox with keyboard/touch/swipe navigation
 - 4-column portrait product grid (2-col tablet, 1-col mobile)
 - Add to Cart → qty picker transformation
-- Sticky cart bar with live totals and shipping calculation
-- Checkout modal with address form + Razorpay payment
+- Sticky cart bar with live totals, shipping calculation, and offer tag
+- Checkout modal with offer reminder, address form + Cashfree payment
+- Customer reviews section with rating badge
+- FAQ accordion section (also in JSON-LD for Google rich results)
 - Scroll-triggered fade-in animations with staggered timing
 - Active nav link highlighting on scroll
 - Mobile-responsive hamburger menu
 - Full-screen checkout modal on mobile
+- SEO: JSON-LD structured data (LocalBusiness, 4x Product, FAQPage), sitemap.xml, robots.txt
 
 ## Development
 

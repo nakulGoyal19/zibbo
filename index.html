@@ -226,9 +226,9 @@
 </head>
 <body>
 
-    <!-- Diwali Offer Banner -->
-    <div class="offer-bar">
-        <span>&#127978; Diwali Special – 10% OFF! Code: <strong>ZIBBODIWALI10</strong></span>
+    <!-- Diwali Offer Banner (auto-hides after 8 Nov 2026) -->
+    <div class="offer-bar diwali-offer" id="offer-bar" style="display:none;">
+        <span>&#127978; 10% OFF till 8th Nov! Code: <strong>ZIBBODIWALI10</strong></span>
     </div>
 
     <!-- Navigation -->
@@ -267,7 +267,8 @@
     <section class="hero" id="hero">
         <div class="container hero-content">
             <div class="hero-text">
-                <div class="launch-badge">&#127978; Diwali Special — 10% OFF</div>
+                <div class="launch-badge diwali-offer" style="display:none;">&#127978; Diwali Special — 10% OFF</div>
+                <div class="launch-badge no-offer-badge">Now Available</div>
                 <h1>Premium Makhana<br><span class="highlight">Delivered to You</span></h1>
                 <p class="hero-subtitle">India's finest fox nuts — naturally nutritious, light & crunchy, zero preservatives. Buy makhana online in 4 packs, starting at ₹149.</p>
                 <div class="hero-cta">
@@ -277,7 +278,7 @@
                         WhatsApp
                     </a>
                 </div>
-                <p class="hero-offer-code">Use code <strong>ZIBBODIWALI10</strong> at checkout</p>
+                <p class="hero-offer-code diwali-offer" style="display:none;">Use code <strong>ZIBBODIWALI10</strong> at checkout</p>
             </div>
             <div class="hero-image">
                 <div class="hero-carousel" style="cursor:pointer;">
@@ -732,7 +733,7 @@
                 <span class="cart-bar-sep">·</span>
                 <span class="cart-bar-total" id="cart-bar-total">₹0</span>
                 <span class="cart-bar-shipping" id="cart-bar-shipping"></span>
-                <span class="cart-bar-offer">&#127978; ZIBBODIWALI10</span>
+                <span class="cart-bar-offer diwali-offer" style="display:none;">&#127978; ZIBBODIWALI10</span>
             </div>
             <button class="btn btn-primary btn-sm cart-bar-checkout" id="cart-bar-checkout">
                 Checkout
@@ -764,9 +765,9 @@
                 <!-- Shipping info line -->
                 <div class="checkout-shipping-info" id="checkout-shipping-info"></div>
 
-                <!-- Diwali Offer Reminder -->
-                <div class="checkout-offer-reminder">
-                    <div class="checkout-offer-title">&#127978; Diwali Special Offer</div>
+                <!-- Diwali Offer Reminder (auto-hides after 8 Nov 2026) -->
+                <div class="checkout-offer-reminder diwali-offer" style="display:none;">
+                    <div class="checkout-offer-title">&#127978; Diwali Special Offer — till 8th Nov</div>
                     <div class="checkout-offer-desc">Flat 10% OFF on your order! Apply coupon code on the payment page.</div>
                     <div class="checkout-offer-code">ZIBBODIWALI10</div>
                 </div>

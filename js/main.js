@@ -4,6 +4,24 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- Diwali Offer: show all .diwali-offer elements until 8 Nov 2026 end of day IST ---
+    const offerEnd = new Date('2026-11-09T00:00:00+05:30'); // 9 Nov midnight IST = offer over
+    const isOfferActive = new Date() < offerEnd;
+
+    if (isOfferActive) {
+        document.querySelectorAll('.diwali-offer').forEach(el => {
+            el.style.display = '';
+        });
+        // Hide the fallback "Now Available" badge
+        const noOfferBadge = document.querySelector('.no-offer-badge');
+        if (noOfferBadge) noOfferBadge.style.display = 'none';
+        // Adjust navbar and hero for offer bar
+        document.querySelector('.navbar').style.top = '28px';
+        document.querySelector('.hero').style.paddingTop = '170px';
+        const mobileMenu = document.querySelector('.mobile-menu');
+        if (mobileMenu) mobileMenu.style.top = '100px';
+    }
+
     // --- Auto-scroll to Products after hero ---
     let userHasScrolled = false;
     const onUserScroll = () => { userHasScrolled = true; };
