@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             heroSlides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % heroSlides.length;
             heroSlides[currentSlide].classList.add('active');
-        }, 3000);
+        }, 1500);
     }
 
     // --- Mobile Menu Toggle ---
@@ -592,30 +592,15 @@ document.addEventListener('DOMContentLoaded', () => {
         resetPayBtn();
     }
 
-    // --- Hero carousel click → add product & scroll to it ---
+    // --- Hero carousel click → scroll to flavoured section ---
     document.querySelectorAll('.hero-slide[data-add-product]').forEach(slide => {
         slide.addEventListener('click', () => {
-            const productId = slide.dataset.addProduct;
-            const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
-            if (!card) return;
+            const flavouredHeader = document.querySelector('.flavoured-header');
+            if (!flavouredHeader) return;
 
-            // Add 1 to cart if not already added
-            if (cart[productId] === 0) {
-                cart[productId] = 1;
-                const qtyValue = card.querySelector('.qty-value');
-                const qtyPicker = card.querySelector('.qty-picker');
-                const addBtn = card.querySelector('.add-to-cart-btn');
-                qtyValue.textContent = 1;
-                addBtn.style.display = 'none';
-                qtyPicker.style.display = '';
-                qtyPicker.classList.add('has-items');
-                updateCartBar();
-            }
-
-            // Scroll to the product card
             const navHeight = document.querySelector('.navbar').offsetHeight;
             window.scrollTo({
-                top: card.getBoundingClientRect().top + window.pageYOffset - navHeight - 20,
+                top: flavouredHeader.getBoundingClientRect().top + window.pageYOffset - navHeight - 20,
                 behavior: 'smooth',
             });
         });

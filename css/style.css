@@ -1706,6 +1706,75 @@ h1, h2, h3, h4 {
     color: var(--green-dark);
 }
 
+/* Flavoured Makhana sub-section header */
+.flavoured-header {
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.plain-header {
+    margin-top: 56px;
+    margin-bottom: 24px;
+}
+
+.flavoured-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+/* Compact flavoured cards — fit all 6 on one screen */
+.product-card--flavour .product-card-img {
+    aspect-ratio: 4 / 4;
+}
+
+.product-card--flavour .product-card-img img {
+    object-fit: contain;
+    padding: 24px;
+}
+
+.product-card--flavour:hover .product-card-img img {
+    transform: scale(1.05);
+}
+
+.product-card--flavour .product-card-body {
+    padding: 8px 12px;
+}
+
+.product-card--flavour .product-card-body h3 {
+    font-size: 0.9rem;
+    margin-bottom: 1px;
+}
+
+.product-card--flavour .product-card-sub {
+    margin-bottom: 4px;
+}
+
+.product-card--flavour .product-card-tags {
+    margin-bottom: 6px;
+    min-height: auto;
+}
+
+.product-card--flavour .product-card-footer {
+    gap: 4px;
+}
+
+/* Force tags to always wrap to 2 lines for consistent card height */
+.product-card-tags {
+    min-height: 44px;
+}
+
+/* Mini coming soon banner (fewer flavours) */
+.coming-soon-mini {
+    padding: 24px 32px;
+    margin-top: 24px;
+}
+
+.coming-soon-mini p {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
 /* --- Reviews Section --- */
 .reviews {
     padding: 80px 0;
@@ -2258,6 +2327,10 @@ h1, h2, h3, h4 {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .flavoured-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .pillars-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -2281,6 +2354,10 @@ h1, h2, h3, h4 {
         max-width: 340px;
         margin-left: auto;
         margin-right: auto;
+    }
+
+    .flavoured-grid {
+        grid-template-columns: 1fr;
     }
 
     .product-card-img {

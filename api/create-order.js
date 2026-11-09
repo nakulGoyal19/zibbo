@@ -6,6 +6,12 @@ const PRODUCTS = {
   'gold-250g': { name: 'Gold Makhana', weight: '250g', price: 349 },
   'handle-250g': { name: 'Makhana Handle Pack', weight: '250g', price: 299 },
   'premium-250g': { name: 'Premium Makhana', weight: '250g', price: 399 },
+  'peri-peri-70g': { name: 'Peri Peri Makhana', weight: '60-77g', price: 189 },
+  'cream-onion-70g': { name: 'Cream & Onion Makhana', weight: '60-77g', price: 189 },
+  'cheddar-cheese-70g': { name: 'Cheddar Cheese Makhana', weight: '60-77g', price: 189 },
+  'tangy-tomato-70g': { name: 'Tangy Tomato Makhana', weight: '60-77g', price: 189 },
+  'minty-pudina-70g': { name: 'Minty Pudina Makhana', weight: '60-77g', price: 189 },
+  'himalayan-salt-70g': { name: 'Himalayan Salt Makhana', weight: '60-77g', price: 189 },
 };
 
 const SHIPPING_FREE_THRESHOLD = 500;
