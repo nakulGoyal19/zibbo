@@ -12,6 +12,16 @@ const PRODUCTS = {
   'tangy-tomato-70g': { name: 'Tangy Tomato Makhana', weight: '60-77g', price: 189 },
   'minty-pudina-70g': { name: 'Minty Pudina Makhana', weight: '60-77g', price: 189 },
   'himalayan-salt-70g': { name: 'Himalayan Salt Makhana', weight: '60-77g', price: 189 },
+  // Flavoured Makhana — 250g Pouches
+  'peri-peri-250g': { name: 'Peri Peri Makhana 250g', weight: '250g', price: 299 },
+  'cream-onion-250g': { name: 'Cream & Onion Makhana 250g', weight: '250g', price: 299 },
+  'cheddar-cheese-250g': { name: 'Cheddar Cheese Makhana 250g', weight: '250g', price: 299 },
+  'tangy-tomato-250g': { name: 'Tangy Tomato Makhana 250g', weight: '250g', price: 299 },
+  'minty-pudina-250g': { name: 'Minty Pudina Makhana 250g', weight: '250g', price: 299 },
+  'himalayan-salt-250g': { name: 'Himalayan Salt Makhana 250g', weight: '250g', price: 299 },
+  'magic-masala-250g': { name: 'Magic Masala Makhana 250g', weight: '250g', price: 299 },
+  'smokey-barbeque-250g': { name: 'Smokey Barbeque Makhana 250g', weight: '250g', price: 299 },
+  'lemon-chilli-250g': { name: 'Lemon Chilli Makhana 250g', weight: '250g', price: 299 },
 };
 
 const SHIPPING_FREE_THRESHOLD = 500;

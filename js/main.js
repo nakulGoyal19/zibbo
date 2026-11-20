@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             heroSlides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % heroSlides.length;
             heroSlides[currentSlide].classList.add('active');
-        }, 1500);
+        }, 1000);
     }
 
     // --- Mobile Menu Toggle ---
@@ -71,6 +71,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // --- Nav dropdown & mobile menu scroll-to links ---
+    document.querySelectorAll('.nav-dropdown-menu a[data-scroll-to], .mobile-menu a[data-scroll-to]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const selector = link.dataset.scrollTo;
+            const target = document.querySelector(selector);
+            if (!target) return;
+            const navHeight = document.querySelector('.navbar').offsetHeight;
+            const y = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        });
+    });
 
     // --- Navbar scroll effect ---
     const navbar = document.querySelector('.navbar');
@@ -592,17 +606,116 @@ document.addEventListener('DOMContentLoaded', () => {
         resetPayBtn();
     }
 
-    // --- Hero carousel click → scroll to flavoured section ---
+    // --- Hero carousel click → scroll to relevant product section ---
     document.querySelectorAll('.hero-slide[data-add-product]').forEach(slide => {
         slide.addEventListener('click', () => {
-            const flavouredHeader = document.querySelector('.flavoured-header');
-            if (!flavouredHeader) return;
+            const productId = slide.dataset.addProduct;
+            const isPouch = productId.endsWith('-250g') && !['gold-250g', 'handle-250g', 'premium-250g'].includes(productId);
+            const target = isPouch
+                ? document.querySelector('.pouch-header')
+                : document.querySelector('.flavoured-header');
+            if (!target) return;
 
             const navHeight = document.querySelector('.navbar').offsetHeight;
             window.scrollTo({
-                top: flavouredHeader.getBoundingClientRect().top + window.pageYOffset - navHeight - 20,
+                top: target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20,
                 behavior: 'smooth',
             });
         });
+    });
+
+    // --- Hero carousel click → scroll to gift hamper section ---
+    document.querySelectorAll('.hero-slide[data-scroll-to="gift-hamper"]').forEach(slide => {
+        slide.addEventListener('click', () => {
+            const target = document.querySelector('.gift-hamper-header');
+            if (!target) return;
+            const navHeight = document.querySelector('.navbar').offsetHeight;
+            window.scrollTo({
+                top: target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20,
+                behavior: 'smooth',
+            });
+        });
+    });
+
+    // --- Gift hamper images → open in lightbox ---
+    const hamperImages = [
+        'assets/images/gift-hampers/cover.jpg',
+        'assets/images/gift-hampers/features.jpg',
+        'assets/images/gift-hampers/cover-portrait.jpg',
+        'assets/images/gift-hampers/bulk.jpg',
+    ];
+    document.querySelectorAll('.gift-hamper-img img').forEach((img, i) => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => openLightbox(hamperImages, i));
+    });
+
+    // --- Product info icon — hover on desktop, tap on mobile ---
+    // Create a single mobile tooltip container appended to body
+    const mobileTooltip = document.createElement('div');
+    mobileTooltip.className = 'product-info-mobile-tooltip';
+    mobileTooltip.addEventListener('click', (e) => e.stopPropagation());
+    document.body.appendChild(mobileTooltip);
+
+    document.querySelectorAll('.product-card[data-product-id]').forEach(card => {
+        const tags = card.querySelector('.product-card-tags');
+        const desc = card.querySelector('.product-card-desc');
+        if (!tags && !desc) return;
+
+        // Build tooltip content
+        const items = [];
+        if (tags) {
+            tags.querySelectorAll('li').forEach(li => items.push(li.textContent));
+        }
+        const descText = desc ? desc.textContent : '';
+        const name = card.querySelector('h3') ? card.querySelector('h3').textContent : '';
+
+        let tooltipHTML = '';
+        if (name) {
+            tooltipHTML += '<strong class="info-name">' + name + '</strong>';
+        }
+        if (items.length) {
+            tooltipHTML += '<div class="info-tags">' + items.map(t => '<span>' + t + '</span>').join('') + '</div>';
+        }
+        if (descText) {
+            tooltipHTML += '<p>' + descText + '</p>';
+        }
+
+        // Create info button wrapper (hover target for desktop tooltip)
+        const wrap = document.createElement('div');
+        wrap.className = 'product-info-wrap';
+
+        const btn = document.createElement('div');
+        btn.className = 'product-info-btn';
+        btn.setAttribute('aria-label', 'Product highlights');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+
+        // Desktop tooltip (inside wrap, shown via CSS hover)
+        const desktopTip = document.createElement('div');
+        desktopTip.className = 'product-info-tooltip';
+        desktopTip.innerHTML = tooltipHTML;
+
+        wrap.appendChild(btn);
+        wrap.appendChild(desktopTip);
+        card.appendChild(wrap);
+
+        // Mobile: tap opens global tooltip at bottom of screen
+        wrap.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (window.innerWidth <= 768) {
+                const wasOpen = mobileTooltip.classList.contains('open') && mobileTooltip.dataset.productId === card.dataset.productId;
+                mobileTooltip.classList.remove('open');
+                if (!wasOpen) {
+                    mobileTooltip.innerHTML = tooltipHTML;
+                    mobileTooltip.dataset.productId = card.dataset.productId;
+                    mobileTooltip.classList.add('open');
+                }
+            }
+        });
+    });
+
+    // Close mobile tooltip on outside tap
+    document.addEventListener('click', () => {
+        mobileTooltip.classList.remove('open');
     });
 });

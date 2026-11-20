@@ -69,6 +69,7 @@ zibbo/
 │   │   ├── gold/              # Gold Makhana (250g) — 1-front.jpeg + gallery
 │   │   ├── red-handle/        # Makhana Handle Pack (250g) — 1-front.png, 2-back.png
 │   │   └── premium/           # Premium Makhana (250g) — 1-front.jpeg + gallery
+│   ├── gift-hampers/          # Custom gift hamper images (cover, features, cover-portrait, bulk)
 │   ├── zibbo-logo.jpeg        # Brand logo
 │   ├── favicon-32.png         # Browser tab icon 32x32
 │   ├── favicon-16.png         # Browser tab icon 16x16
@@ -92,7 +93,7 @@ Each product folder follows this structure:
 ### index.html (Main Page)
 
 0. **Offer Bar** — Fixed top banner for time-limited offers (e.g. Diwali 10% OFF). Auto-hides after expiry date via JS date check. All offer elements use `.diwali-offer` class and `style="display:none"` default, JS reveals them if `new Date() < offerEnd`.
-1. **Navbar** — Fixed top (shifts down 28px when offer bar active), logo + 4 links (About, Products, Why Makhana, Contact) + "Shop Now" button, mobile hamburger
+1. **Navbar** — Fixed top (shifts down 28px when offer bar active), logo + links (About, Products dropdown [Flavoured Makhana, Flavoured 250g Family Pack, Plain Makhana, Custom Gift Hampers], Why Makhana, Contact) + "Shop Now" button, mobile hamburger with same links expanded
 2. **Hero** — Diwali badge (or "Now Available" when no offer), keyword-rich H1 "Premium Makhana Delivered to You", subtitle with pricing, two CTAs ("Shop Now" primary, "WhatsApp" secondary), coupon code text, auto-rotating image carousel (all 4 pack images, 3s interval, click adds product to cart & scrolls to card)
 3. **Products** — 4 product cards in 4-column portrait grid (2-col tablet, 1-col mobile) with:
    - Single full-width front image, lightbox gallery on click, badges, tags
@@ -100,12 +101,13 @@ Each product folder follows this structure:
    - Pricing (MRP strikethrough + selling price + discount badge)
    - "Add to Cart" button → transforms to qty picker (−/+) on click
    - Max 100 per product
-4. **Flavoured Makhana — Coming Soon** — Teaser with 9 flavour tags (Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy Tomato, Magic Masala, Smokey Barbeque, Lemon Chilli)
-5. **WhatsApp CTA Banner** — Secondary option for bulk/wholesale orders
-6. **Reviews** — 4.9/5 rating badge, 3 customer review cards with order badges
-7. **About** — 3 cards: Our Story, Our Mission, Made in India
-8. **Why Zibbo** — 4 pillar cards with numbered headers and top-border hover effect
-9. **FAQ** — 6 expandable accordion questions (also in JSON-LD FAQPage schema for Google)
+4. **Flavoured Makhana — 250g Family Pouches** — 9 flavoured makhana in 250g zip-lock pouches (Peri Peri, Cream & Onion, Cheddar Cheese, Tangy Tomato, Minty Pudina, Himalayan Salt, Magic Masala, Smokey Barbeque, Lemon Chilli)
+5. **Custom Gift Hampers** — 4-image gallery (2x2 grid, clickable lightbox), 4 feature cards (Your Mix, Natural Jute Bag, Your Logo, Bulk Orders), WhatsApp CTA (+91 97814 04190) + Email CTA for enquiries
+6. **WhatsApp CTA Banner** — Secondary option for bulk/wholesale/gift hamper orders
+7. **Reviews** — 4.9/5 rating badge, 3 customer review cards with order badges
+8. **About** — 3 cards: Our Story, Our Mission, Made in India
+9. **Why Zibbo** — 4 pillar cards with numbered headers and top-border hover effect
+10. **FAQ** — 8 expandable accordion questions including gift hamper FAQs (also in JSON-LD FAQPage schema for Google)
 10. **Contact** — 3 cards: WhatsApp (link), Email (link), Instagram (link)
 11. **Footer** — Centered stacked layout: logo, nav links, policy links, social icons, FSSAI + GSTIN + address
 12. **Sticky Cart Bar** — Fixed bottom, appears when items added, shows item count + subtotal + shipping + offer tag + Checkout button
@@ -118,7 +120,7 @@ Each product folder follows this structure:
 - Nutrition facts per 100g (styled table)
 - 8 health benefit cards
 - Makhana vs Chips vs Popcorn vs Almonds comparison table
-- Flavoured Makhana Coming Soon section
+- Flavoured Makhana — all 9 flavours now available (box packs + 250g pouches)
 - Shop CTA
 
 ### Policy Pages (terms, privacy, refund-policy, shipping-policy)
@@ -129,12 +131,47 @@ Each product folder follows this structure:
 
 ## Products (SKUs)
 
+### Plain Makhana
+
 | Pack | Name | Format | Weight | MRP | Selling | Grade |
 |------|------|--------|--------|-----|---------|-------|
 | Red Mini | Makhana Mini Pack | Zip-lock standup pouch | 100g | ₹299 | ₹149 | Regular |
 | Gold | Gold Makhana | Zip-lock standup pouch | 250g | ₹699 | ₹349 | Jumbo, handpicked |
 | Red Handle | Makhana Handle Pack | Handle packet | 250g | ₹600 | ₹299 | Regular |
 | Premium | Premium Makhana | Zip-lock standup pouch | 250g | ₹899 | ₹399 | Largest, most premium, handpicked |
+
+### Flavoured Makhana — Box Packs (60-77g)
+
+| Flavour | SKU ID | Format | Weight | MRP | Selling |
+|---------|--------|--------|--------|-----|---------|
+| Peri Peri | peri-peri-70g | Box pack | 60-77g | ₹299 | ₹189 |
+| Cream & Onion | cream-onion-70g | Box pack | 60-77g | ₹299 | ₹189 |
+| Cheddar Cheese | cheddar-cheese-70g | Box pack | 60-77g | ₹299 | ₹189 |
+| Tangy Tomato | tangy-tomato-70g | Box pack | 60-77g | ₹299 | ₹189 |
+| Minty Pudina | minty-pudina-70g | Box pack | 60-77g | ₹299 | ₹189 |
+| Himalayan Salt | himalayan-salt-70g | Box pack | 60-77g | ₹299 | ₹189 |
+
+### Flavoured Makhana — 250g Family Pouches
+
+| Flavour | SKU ID | Format | Weight | MRP | Selling |
+|---------|--------|--------|--------|-----|---------|
+| Peri Peri | peri-peri-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Cream & Onion | cream-onion-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Cheddar Cheese | cheddar-cheese-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Tangy Tomato | tangy-tomato-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Minty Pudina | minty-pudina-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Himalayan Salt | himalayan-salt-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Magic Masala | magic-masala-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Smokey Barbeque | smokey-barbeque-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+| Lemon Chilli | lemon-chilli-250g | Zip-lock standup pouch | 250g | ₹649 | ₹299 |
+
+### Custom Gift Hampers (Enquiry-based, not online checkout)
+
+- **Format:** Natural jute bag with lace trim & clear window, 2/3/4 flavoured makhana jars
+- **Customisation:** Custom sticker with company logo, name, or personalised message
+- **Use cases:** Corporate gifting, Diwali hampers, wedding favours, festive gifts, employee welcome kits
+- **Contact:** WhatsApp +91 97814 04190 / Email zibbofoods@gmail.com
+- **Images:** `assets/images/gift-hampers/` (cover.jpg, features.jpg, cover-portrait.jpg, bulk.jpg)
 
 ## Shipping & Returns
 
@@ -169,9 +206,6 @@ Each product folder follows this structure:
 - Manual fulfilment: check dashboard/email → pack → ship → WhatsApp tracking to customer
 
 ## Coming Soon
-
-### Flavoured Makhana
-Peri Peri, Cheddar Cheese, Himalayan Salt, Cream & Onion, Minty Pudina, Tangy Tomato, Magic Masala, Smokey Barbeque, Lemon Chilli
 
 ### Future Products
 - Royal Medley (mix of makhana, seeds, dry fruits)
